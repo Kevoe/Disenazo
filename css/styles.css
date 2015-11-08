@@ -1,0 +1,13 @@
+.navbar {
+    margin-bottom: 0;
+}
+
+.carousel, .carousel-inner > .item > img {
+    margin: 0 auto;
+    height:280px;
+}
+
+.thumb > a > img {
+    margin: 0 auto;
+    height:300px;
+}
