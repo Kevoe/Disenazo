@@ -49,4 +49,100 @@
 		return array('status' => 'ERROR', 'code' => $type);
 	}
 
+    # Query to retrieve a user data
+    function validateUserCredentials($userName)
+    {
+        # Open and validate the Database connection
+    	$conn = connect();
+
+        if ($conn != null)
+        {
+        	$sql = "SELECT * FROM User WHERE userName = '$userName'";
+			$result = $conn->query($sql);
+
+			# The current user exists
+			if ($result->num_rows > 0)
+			{
+				while($row = $result->fetch_assoc())
+		    	{
+					$conn->close();
+					return array("status" => "COMPLETE", "fName" => $row['fName'], "lName" => $row['lName'], "password" => $row['passwrd']);
+				}
+			}
+			else
+			{
+				# The user doesn't exists in the Database
+				$conn->close();
+				return errors(400);
+			}
+        }
+        else
+        {
+        	# Connection to Database was not successful
+        	$conn->close();
+        	return errors(500);
+        }
+    }
+
+    # Query to find out if the user already exist in the Database
+    function verifyUser($userName)
+    {
+    	# Open and validate the Database connection
+    	$conn = connect();
+
+        if ($conn != null)
+        {
+        	$sql = "SELECT * FROM User WHERE userName = '$userName'";
+			$result = $conn->query($sql);
+
+			if ($result->num_rows > 0)
+			{
+				# The current user already exists
+				$conn->close();
+				return errors(412);
+			}
+			else
+			{
+				$conn->close();
+				return array("status" => "COMPLETE");
+			}
+        }
+        else
+        {
+        	# Connection to Database was not successful
+        	$conn->close();
+        	return errors(500);
+        }
+    }
+
+    # Query to insert a new user to the Database
+    function registerNewUser($userFirstName, $userLastName, $userName, $email, $userPassword)
+    {
+    	# Open and validate the Database connection
+    	$conn = connect();
+
+        if ($conn != null)
+        {
+        	$sql = "INSERT INTO User(fName, lName, userName, email, passwrd) VALUES ('$userFirstName', '$userLastName', '$userName', '$email', '$userPassword')";
+			if (mysqli_query($conn, $sql))
+	    	{
+	    		$conn->close();
+			    return array("status" => "COMPLETE");
+			}
+			else
+			{
+				$conn->close();
+				return errors(409);
+			}
+        }
+        else
+        {
+        	# Connection to Database was not successful
+        	$conn->close();
+        	return errors(500);
+        }
+    }
+
+
+
 ?>
