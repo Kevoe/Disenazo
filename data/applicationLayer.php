@@ -10,16 +10,24 @@
 	$action = $_POST['action'];
 	switch($action)
 	{
-        case 'LOGIN':	userLogin();
-						break;
-		case 'COOKIE':	verifyCookies();
-						break;
-		case 'END_SES': endSession();
-						break;
-		case 'GET_SES':	getSession();
-						break;
-		case 'REGISTER':registerUser();
-						break;
+        case 'LOGIN':	      userLogin();
+						      break;
+		case 'COOKIE':	      verifyCookies();
+						      break;
+		case 'END_SES':       endSession();
+						      break;
+		case 'GET_SES':	      getSession();
+						      break;
+		case 'REGISTER':      registerUser();
+						      break;
+        case 'NEW_DESIGNS':   getDesigns('NEW_DESIGNS');
+                              break;
+        case 'MOST_POP_WEEK': getDesigns('MOST_POP_WEEK');
+                              break;
+        case 'DESIGN':        getCompleteDesign();
+                              break;
+        case 'ADD_CART':      addItemsToCart();
+                              break;
 	}
 
     # ACtion to login the current user credentials and redirect it to home.html
@@ -202,6 +210,86 @@
 			session_destroy();
 
 			echo json_encode(array('success' => 'Session deleted'));
+		}
+		else
+		{
+			die(json_encode(errors(417)));
+		}
+	}
+
+    #Action to get all designs from the newest to the oldest
+    function getDesigns($act)
+    {
+        # Execute the action to get different designs
+        switch($act)
+    	{
+            case 'NEW_DESIGNS':   $result = getNewestDesignsDB();
+                                  break;
+            case 'MOST_POP_WEEK': $result = mostPopularInTheWeekDB();
+                                  break;
+    	}
+
+        if($result['message'] == 'OK')
+        {
+            echo json_encode($result);
+        }
+        else
+        {
+            if($result['message'] == 'NONE')
+            {
+                # Designs not found
+                echo json_encode($result);
+            }
+            else
+            {
+                die(json_encode($result));
+            }
+        }
+    }
+
+    #Action to get the whole design info
+    function getCompleteDesign()
+    {
+        $designId = $_POST['designId'];
+        $result = getCompleteDesignDB($designId);
+
+        if($result['message'] == 'OK')
+        {
+            # All the info of the design
+            echo json_encode($result);
+        }
+        else
+        {
+            if($result['message'] == 'NONE')
+            {
+                # No designs with that designId
+                echo json_encode($result);
+            }
+            else
+            {
+                # Error
+                die(json_encode($result));
+            }
+        }
+    }
+
+    # Action to add Items to the Cart
+	function addItemsToCart()
+	{
+		$order = $_POST['order'];
+		session_start();
+		if(isset($_SESSION['userName']))
+		{
+			$result = addItemsToCartDB($_SESSION['userName'], $order);
+			if($result['status'] == 'COMPLETE')
+			{
+				echo json_encode($result);
+			}
+			else
+			{
+                # Something went wrong
+				die(json_encode($result));
+			}
 		}
 		else
 		{

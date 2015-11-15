@@ -143,6 +143,138 @@
         }
     }
 
+    #Query to get all designs ordered by date
+    function getNewestDesignsDB()
+    {
+        $conn = connect();
 
+        if($conn != null)
+        {
+            $sql = "SELECT * FROM Design ORDER BY uploadDate DESC";
+            $result = $conn->query($sql);
+
+            if($result->num_rows > 0)
+            {
+                $data = array();
+                while($row = $result->fetch_assoc())
+                {
+                    array_push($data,array('designId' => $row['designId'], 'designName' => $row['designName']));
+                }
+
+                $response = array('message' => 'OK', 'data' => $data);
+                $conn->close();
+                return $response;
+            }
+            else
+            {
+                return array('message' => 'NONE');
+            }
+        }
+        else
+        {
+            $conn->close();
+            return errors(500);
+        }
+    }
+
+    #Query to get the 5 most viewed designs in the week
+    function mostPopularInTheWeekDB()
+    {
+        $conn = connect();
+
+        if($conn != null)
+        {
+            $sql = "SELECT * FROM Design WHERE uploadDate > DATE_SUB(curdate(), INTERVAL 1 WEEK) ORDER BY views DESC LIMIT 5";
+            $result = $conn->query($sql);
+
+            if($result->num_rows > 0)
+            {
+                $data = array();
+                while($row = $result->fetch_assoc())
+                {
+                    array_push($data,array('designId' => $row['designId'], 'designName' => $row['designName']));
+                }
+
+                $response = array('message' => 'OK', 'data' => $data);
+                $conn->close();
+                return $response;
+            }
+            else
+            {
+                return array('message' => 'NONE');
+            }
+        }
+        else
+        {
+            $conn->close();
+            return errors(500);
+        }
+    }
+
+    # Query to get all the info about a design
+    function getCompleteDesignDB($designId)
+    {
+        $conn = connect();
+
+        if($conn != null)
+        {
+            $sql = "SELECT * FROM Design WHERE designId = '$designId'";
+            $result = $conn->query($sql);
+
+            if($result->num_rows > 0)
+            {
+                while($row = $result->fetch_assoc())
+                {
+                    $conn->close();
+                    $data[]=array_map('utf8_encode', $row);
+                    return $response = array('message' => 'OK', 'data' => $data);
+                }
+            }
+            else
+            {
+                return array('message' => 'NONE');
+            }
+        }
+        else
+        {
+            $conn->close();
+            return errors(500);
+        }
+    }
+
+    #Query to add Items to the Cart
+	function addItemsToCartDB($username, $totalPrice, $order)
+	{
+		$conn = connect();
+		if($conn != null)
+		{
+            $userName =  $_POST['userName'];
+            $design = $_POST['design'];
+            $product =  $_POST['product'];
+            $color =  $_POST['color'];
+            $size =  $_POST['size'];
+            $unitPrice =  $_POST['unitPrice'];
+            $quantity =  $_POST['quantity'];
+            $totalPrice = $_POST['unitPrice'] + $_POST['quantity'];
+
+			$sql = "INSERT INTO Cart(userName,design,product,color,size,unitPrice,quantity,totalPrice,status) VALUES ('Daredevil','$design','$product','$color','$size','$unitPrice','$quantity','$totalPrice','P')";
+
+			if(mysqli_query($conn, $sql))
+			{
+                $conn->close();
+                return array("status" => "COMPLETE");
+			}
+			else
+			{
+				$conn->close();
+				return errors(409);
+			}
+		}
+		else
+		{
+			$conn->close();
+			return errors(500);
+		}
+	}
 
 ?>

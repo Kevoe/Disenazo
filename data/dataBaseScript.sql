@@ -83,6 +83,8 @@ CREATE TABLE Cart(
 
 --ALTER TABLE Design add uploadDate DATETIME DEFAULT NOW() AFTER designName;
 
+--UPDATE Design SET views = 32 WHERE designId = alien_j3s94hjdolp8x;
+
 --Static products
 --Divider is to balance the price of design per product
 INSERT INTO Product (productName, type, price, divider)
@@ -111,4 +113,6 @@ INSERT INTO User (fName, lName, userName, email, passwrd)
 VALUES 	('Matt', 'Murdock', 'Daredevil', 'dare@devil', 'daredevil');
 
 INSERT INTO Design (designId, userName, designName, description, price)
-VALUES 	('alien_j3s94hjdolp8x', 'Daredevil', 'alienigena', 'Un diseño espacial de un alien', 70);
+VALUES 	('alien_j3s94hjdolp8x', 'Daredevil', 'alienigena', 'Un diseño espacial de un alien', 70),
+		('coffee_42jh4ilos39uc', 'Daredevil', 'coffee', 'Diseño de una taza bien rara', 50),
+		('owl_yinyang_jkj48sidl98j3', 'Daredevil', 'owl_yinyang', 'El yinyang representado con unas lechuzas', 70);
